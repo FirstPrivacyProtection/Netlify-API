@@ -1,7 +1,11 @@
-export function getIPData(request) {
+// netlify/lib/ip.js
+function getIPData(event) {
   const ip =
-    request.headers.get("x-forwarded-for") ||
+    event.headers["x-forwarded-for"] ||
+    event.headers["client-ip"] ||
     "unknown";
 
   return { ip };
 }
+
+module.exports = { getIPData };
