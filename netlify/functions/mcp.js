@@ -1,14 +1,62 @@
 const { getTimeData } = require("../lib/ts");
 const { getIPData } = require("../lib/ip");
 
+/**
+ * 统一JSON响应
+ * @param {number} statusCode HTTP状态码
+ * @param {object|string} body 响应体
+ */
+function resJson(statusCode, body) {
+  return {
+    statusCode,
+    headers: { "Content-Type": "application/json" },
+    body: typeof(body) === "string" ? body : JSON.stringify(body)
+  };
+}
+
+/**
+ * 普通错误响应
+ * @param {number} statusCode 
+ * @param {string} message 
+ */
+function resError(statusCode, message) {
+  return resJson(statusCode, { error: message });
+}
+
+/**
+ * JSON-RPC成功响应
+ * @param {string|number|null} id 
+ * @param {object} result 
+ */
+function resRpc(id, result) {
+  return resJson(200, {
+    jsonrpc: "2.0",
+    id,
+    result
+  });
+}
+
+/**
+ * JSON-RPC错误响应
+ * @param {string|number|null} id 
+ * @param {number} code 
+ * @param {string} message 
+ */
+function resRpcError(id, code, message) {
+  return resJson(400, {
+    jsonrpc: "2.0",
+    id,
+    error: {
+      code,
+      message
+    }
+  });
+}
+
 exports.handler = async (event) => {
 
   if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Method Not Allowed" })
-    };
+    return resError(405, "Method Not Allowed");
   }
 
   let req;
@@ -16,74 +64,50 @@ exports.handler = async (event) => {
   try {
     req = JSON.parse(event.body || "{}");
   } catch (e) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Invalid JSON" })
-    };
+    return resError(400, "Invalid JSON");
   }
 
   // ===== notification（必须支持）=====
   if (req.method === "notifications/initialized") {
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: ""
-    };
+    return resJson(200, "");
   }
 
   // ===== initialize =====
   if (req.method === "initialize") {
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: req.id,
-        result: {
-          protocolVersion: "2024-11-05",
-          capabilities: { tools: {} },
-          serverInfo: {
-            name: "netlify-mcp",
-            version: "1.0.0"
-          }
-        }
-      })
-    };
+    return resRpc(req.id, {
+      protocolVersion: "2024-11-05",
+      capabilities: { tools: {} },
+      serverInfo: {
+        name: "netlify-mcp",
+        version: "1.0.0"
+      }
+    });
   }
 
   // ===== tools/list =====
   if (req.method === "tools/list") {
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: req.id,
-        result: {
-          tools: [
-            {
-              name: "getNowTime",
-              description: "获取当前时间、时区、时间戳",
-              inputSchema: {
-                type: "object",
-                properties: {},
-                required: []
-              }
-            },
-            {
-              name: "getIP",
-              description: "获取当前IP地址",
-              inputSchema: {
-                type: "object",
-                properties: {},
-                required: []
-              }
-            }
-          ]
+    return resRpc(req.id, {
+      tools: [
+        {
+          name: "getNowTime",
+          description: "获取当前时间、时区、时间戳",
+          inputSchema: {
+            type: "object",
+            properties: {},
+            required: []
+          }
+        },
+        {
+          name: "getIP",
+          description: "获取当前IP地址",
+          inputSchema: {
+            type: "object",
+            properties: {},
+            required: []
+          }
         }
-      })
-    };
+      ]
+    });
   }
 
   // ===== tools/call =====
@@ -92,40 +116,13 @@ exports.handler = async (event) => {
     const toolName = req.params?.name;
 
     if (toolName === "getNowTime") {
-      return {
-        statusCode: 200,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: req.id,
-          result: getTimeData()
-        })
-      };
+      return resRpc(req.id, getTimeData());
     }
 
     if (toolName === "getIP") {
-      return {
-        statusCode: 200,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: req.id,
-          result: getIPData(event)
-        })
-      };
+      return resRpc(req.id, getIPData(event));
     }
   }
 
-  return {
-    statusCode: 400,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: req.id,
-      error: {
-        code: -32601,
-        message: "Method not found"
-      }
-    })
-  };
+  return resRpcError(req?.id, -32601, "Method not found");
 };
