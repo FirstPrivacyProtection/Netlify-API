@@ -1,12 +1,12 @@
-import ts from "../../functions/ts.js";
-import ip from "../../functions/ip.js";
+import { getTimeData } from "../lib/ts.js";
+import { getIPData } from "../lib/ip.js";
 
-export default async () => {
+export default async (request) => {
 
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
-    async start(controller) {
+    start(controller) {
 
       const send = (data) => {
         controller.enqueue(
@@ -14,7 +14,6 @@ export default async () => {
         );
       };
 
-      // MCP 初始化
       send({
         jsonrpc: "2.0",
         method: "initialize",
@@ -25,7 +24,6 @@ export default async () => {
         }
       });
 
-      // tools list
       send({
         jsonrpc: "2.0",
         method: "tools/list",
@@ -52,8 +50,7 @@ export default async () => {
   return new Response(stream, {
     headers: {
       "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      "Connection": "keep-alive"
+      "Cache-Control": "no-cache"
     }
   });
 };
