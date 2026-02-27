@@ -9,6 +9,11 @@
   status = 200
 
 [[redirects]]
+  from = "/sse"
+  to = "/.netlify/functions/sse"
+  status = 200
+
+[[redirects]]
   from = "/"
   to = "/.netlify/functions/home"
   status = 200
