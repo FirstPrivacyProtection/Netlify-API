@@ -90,7 +90,7 @@ exports.handler = async (event) => {
       tools: [
         {
           name: "getNowTime",
-          description: "获取当前时间、时区、时间戳",
+          description: "获取当前时间、时区（无完整时区名称，仅保证ISO8601时区偏移正确可用）、时间戳",
           inputSchema: {
             type: "object",
             properties: {},
