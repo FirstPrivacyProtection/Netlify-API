@@ -153,6 +153,7 @@ exports.handler = async (event) => {
       error: {
         code: -32601,
         message: "Method not found"
+        Method: req.method
       }
     })
   };
