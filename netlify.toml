@@ -8,10 +8,9 @@
   to = "/.netlify/functions/ip"
   status = 200
 
-[[redirects]]
-  from = "/sse"
-  to = "/.netlify/functions/sse"
-  status = 200
+[[edge_functions]]
+  function = "sse"
+  path = "/sse"
 
 [[redirects]]
   from = "/"
