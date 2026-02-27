@@ -1,4 +1,5 @@
-export function getTimeData() {
+// netlify/lib/ts.js
+function getTimeData() {
   const now = Date.now();
   const date = new Date(now);
 
@@ -10,6 +11,9 @@ export function getTimeData() {
 
   return {
     timestamp: now,
+    timezone: "Asia/Singapore",
     timeNow: sj
   };
 }
+
+module.exports = { getTimeData };
