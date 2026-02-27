@@ -5,11 +5,15 @@ const { getIPData } = require("../lib/ip");
 
 exports.handler = async (event) => {
 
-  // 只允许 POST
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      body: "Method Not Allowed"
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        error: "Method Not Allowed"
+      })
     };
   }
 
@@ -20,7 +24,12 @@ exports.handler = async (event) => {
   } catch (e) {
     return {
       statusCode: 400,
-      body: "Invalid JSON"
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        error: "Invalid JSON"
+      })
     };
   }
 
@@ -28,6 +37,9 @@ exports.handler = async (event) => {
   if (req.method === "initialize") {
     return {
       statusCode: 200,
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: req.id,
@@ -49,6 +61,9 @@ exports.handler = async (event) => {
   if (req.method === "tools/list") {
     return {
       statusCode: 200,
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: req.id,
@@ -86,6 +101,9 @@ exports.handler = async (event) => {
     if (toolName === "getNowTime") {
       return {
         statusCode: 200,
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           jsonrpc: "2.0",
           id: req.id,
@@ -97,6 +115,9 @@ exports.handler = async (event) => {
     if (toolName === "getIP") {
       return {
         statusCode: 200,
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           jsonrpc: "2.0",
           id: req.id,
@@ -107,6 +128,9 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 400,
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: req.id,
@@ -120,6 +144,9 @@ exports.handler = async (event) => {
 
   return {
     statusCode: 400,
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({
       jsonrpc: "2.0",
       id: req.id,
