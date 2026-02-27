@@ -1,0 +1,9 @@
+[[redirects]]
+  from = "/ts"
+  to = "/.netlify/functions/ts"
+  status = 200
+
+[[redirects]]
+  from = "/ip"
+  to = "/.netlify/functions/ip"
+  status = 200
