@@ -7,3 +7,9 @@
   from = "/ip"
   to = "/.netlify/functions/ip"
   status = 200
+
+[[redirects]]
+  from = "/"
+  to = "/.netlify/functions/home"
+  status = 200
+  
