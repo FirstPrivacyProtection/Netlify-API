@@ -11,7 +11,6 @@ function getTimeData() {
 
   return {
     timestamp: now,
-    timezone: "Asia/Singapore",
     timeNow: sj
   };
 }
