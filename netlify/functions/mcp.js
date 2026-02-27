@@ -1,5 +1,3 @@
-// netlify/functions/mcp.js
-
 const { getTimeData } = require("../lib/ts");
 const { getIPData } = require("../lib/ip");
 
@@ -8,12 +6,8 @@ exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        error: "Method Not Allowed"
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Method Not Allowed" })
     };
   }
 
@@ -24,12 +18,17 @@ exports.handler = async (event) => {
   } catch (e) {
     return {
       statusCode: 400,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        error: "Invalid JSON"
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Invalid JSON" })
+    };
+  }
+
+  // ===== notification（必须支持）=====
+  if (req.method === "notifications/initialized") {
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: ""
     };
   }
 
@@ -37,17 +36,13 @@ exports.handler = async (event) => {
   if (req.method === "initialize") {
     return {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: req.id,
         result: {
           protocolVersion: "2024-11-05",
-          capabilities: {
-            tools: {}
-          },
+          capabilities: { tools: {} },
           serverInfo: {
             name: "netlify-mcp",
             version: "1.0.0"
@@ -61,9 +56,7 @@ exports.handler = async (event) => {
   if (req.method === "tools/list") {
     return {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: req.id,
@@ -71,7 +64,7 @@ exports.handler = async (event) => {
           tools: [
             {
               name: "getNowTime",
-              description: "获取当前的时间、时区、时间戳",
+              description: "获取当前时间、时区、时间戳",
               inputSchema: {
                 type: "object",
                 properties: {},
@@ -80,7 +73,7 @@ exports.handler = async (event) => {
             },
             {
               name: "getIP",
-              description: "获取当前的IP地址",
+              description: "获取当前IP地址",
               inputSchema: {
                 type: "object",
                 properties: {},
@@ -101,9 +94,7 @@ exports.handler = async (event) => {
     if (toolName === "getNowTime") {
       return {
         statusCode: 200,
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           jsonrpc: "2.0",
           id: req.id,
@@ -115,9 +106,7 @@ exports.handler = async (event) => {
     if (toolName === "getIP") {
       return {
         statusCode: 200,
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           jsonrpc: "2.0",
           id: req.id,
@@ -125,34 +114,17 @@ exports.handler = async (event) => {
         })
       };
     }
-
-    return {
-      statusCode: 400,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: req.id,
-        error: {
-          code: -32601,
-          message: "Tool not found"
-        }
-      })
-    };
   }
 
   return {
     statusCode: 400,
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       jsonrpc: "2.0",
       id: req.id,
       error: {
         code: -32601,
-        message: ("Method not found: " + req.method)
+        message: "Method not found"
       }
     })
   };
