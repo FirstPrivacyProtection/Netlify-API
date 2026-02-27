@@ -13,3 +13,7 @@
   to = "/.netlify/functions/home"
   status = 200
   
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/notfound"
+  status = 404
